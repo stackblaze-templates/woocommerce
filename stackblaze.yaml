@@ -1,0 +1,28 @@
+databases:
+  - name: woo-db
+    databaseName: wordpress
+    user: wordpress
+    type: mysql
+services:
+  - type: web
+    name: woocommerce
+    runtime: docker
+    plan: starter
+    autoDeploy: false
+    envVars:
+      - key: WORDPRESS_DB_HOST
+        fromDatabase:
+          name: woo-db
+          property: host
+      - key: WORDPRESS_DB_NAME
+        fromDatabase:
+          name: woo-db
+          property: database
+      - key: WORDPRESS_DB_USER
+        fromDatabase:
+          name: woo-db
+          property: user
+      - key: WORDPRESS_DB_PASSWORD
+        fromDatabase:
+          name: woo-db
+          property: password
