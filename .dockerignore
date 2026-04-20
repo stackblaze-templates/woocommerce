@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.*.local
+.git
+.gitignore
+node_modules
+*.pem
+*.key
+*.log
+.DS_Store
