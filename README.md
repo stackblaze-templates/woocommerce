@@ -110,6 +110,34 @@ See [WooCommerce Plugin Development](https://developer.woocommerce.com/docs/cate
 
 ---
 
+## Security & Production Checklist
+
+> ⚠️ **The default local-development configuration is NOT safe for production.** Review every item below before deploying publicly.
+
+### Required environment variables
+
+Copy `.env.example` to `.env` and set strong, unique values for each variable before running locally or deploying:
+
+| Variable | Description |
+|---|---|
+| `WORDPRESS_DB_PASSWORD` | Password for the WordPress database user |
+| `MYSQL_PASSWORD` | Must match `WORDPRESS_DB_PASSWORD` |
+| `MYSQL_ROOT_PASSWORD` | MySQL root password (keep separate from the app user) |
+
+On StackBlaze (and most managed platforms) these are injected automatically from the attached managed database — you do not need to set them manually.
+
+### Production hardening notes
+
+- **Database credentials** — never use the placeholder values (`change_me`) in a public environment. Generate long random passwords.
+- **WordPress secret keys & salts** — WordPress requires eight secret keys/salts (`AUTH_KEY`, `SECURE_AUTH_KEY`, `LOGGED_IN_KEY`, etc.). Generate unique values at <https://api.wordpress.org/secret-key/1.1/salt/> and pass them as environment variables or write them to `wp-config.php` at container start-up.
+- **WORDPRESS_TABLE_PREFIX** — consider changing from the default `wp_` to a custom prefix to reduce automated SQL-injection attack surface.
+- **File permissions** — the official WordPress Docker image runs Apache as `www-data`. Do not run the container as `root` in production orchestrators (use `securityContext.runAsNonRoot: true` in Kubernetes).
+- **Debug mode** — WordPress `WP_DEBUG` defaults to `false` in the official image. Never enable it in production.
+- **HTTPS** — always serve WordPress behind TLS. StackBlaze handles this automatically via its edge network. For self-hosted deployments, configure an SSL-terminating reverse proxy (e.g. Nginx + Let's Encrypt).
+- **Admin URL** — consider moving `wp-admin` behind a firewall or VPN for additional protection.
+
+---
+
 ### Maintained by [StackBlaze](https://stackblaze.com)
 
 This template is actively maintained by StackBlaze. We perform **weekly automated checks** to ensure:
